@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+
+	<bean id="fights" class="java.util.HashMap"></bean>
+
+
+	<!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+	<!-- +++++++++++++++++++++++++++++++++++ DAO +++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+	<!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+	<bean id="userDao" class="com.epam.publicenemies.dao.impl.UserDaoImpl">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	<bean id="profileDao" class="com.epam.publicenemies.dao.impl.ProfileDaoImpl">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	<bean id="statsDao" class="com.epam.publicenemies.dao.impl.StatsDaoImpl">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+
+	<!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+	<!-- +++++++++++++++++++++++++++++++++++ SERVICES ++++++++++++++++++++++++++++++++++++++++++++++++ -->
+	<!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+	<bean id="userManagerService"
+		class="com.epam.publicenemies.service.impl.UserManagerServiceImpl">
+		<property name="userDao" ref="userDao"></property>
+	</bean>
+	<bean id="profileManagerService"
+		class="com.epam.publicenemies.service.impl.ProfileManagerServiceImpl">
+		<property name="profileDao" ref="profileDao"></property>
+	</bean>
+	<bean id="statsManagerService"
+		class="com.epam.publicenemies.service.impl.ProfileManagerServiceImpl">
+		<property name="statsDao" ref="statsDao"></property>
+	</bean>
+
+	<!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+	<!-- +++++++++++++++++++++++++++++++++++ VALIDATORS ++++++++++++++++++++++++++++++++++++++++++++++ -->
+	<!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+	<bean id="registerUserFormValidator"
+		class="com.epam.publicenemies.web.validators.RegisterUserFormValidator">
+		<property name="userManagerService" ref="userManagerService"></property>
+	</bean>
+	<bean id="loginUserFormValidator"
+		class="com.epam.publicenemies.web.validators.LoginUserFormValidator">
+		<property name="userManagerService" ref="userManagerService"></property>
+	</bean>
+	<!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+	<!-- +++++++++++++++++++++++++++++++++++ CONTROLLERS +++++++++++++++++++++++++++++++++++++++++++++ -->
+	<!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+	<bean id="registerUserController" class="com.epam.publicenemies.web.RegisterUserFormController">
+		<property name="userManagerService" ref="userManagerService"></property>
+		<property name="commandName" value="userToRegister" />
+		<property name="commandClass" value="com.epam.publicenemies.dto.UserDto" />
+		<property name="validator" ref="registerUserFormValidator" />
+		<property name="formView" value="userRegistration" />
+		<property name="successView" value="profileSave.html" />
+	</bean>
+	<bean id="loginUserController" class="com.epam.publicenemies.web.LoginUserFormController">
+		<property name="userManagerService" ref="userManagerService"></property>
+		<property name="commandName" value="userToLogin" />
+		<property name="commandClass" value="com.epam.publicenemies.dto.UserDto" />
+		<property name="validator" ref="loginUserFormValidator" />
+		<property name="formView" value="userLogin" />
+		<property name="successView" value="userStartPage.html" />
+	</bean>
+	<bean id="saveProfileController" class="com.epam.publicenemies.web.SaveProfileFormController">
+		<property name="profileManagerService" ref="profileManagerService"></property>
+		<property name="statsManagerService" ref="statsManagerService"></property>
+		<property name="commandName" value="profileToSave" />
+		<property name="commandClass" value="com.epam.publicenemies.dto.ProfileDto" />
+		<!-- <property name="validator" ref="loginUserFormValidator" /> -->
+		<property name="formView" value="profileSave" />
+		<property name="successView" value="userStartPage.html" />
+	</bean>
+
+	<bean id="newGameController" class="com.epam.publicenemies.web.NewGameFormController">
+		<property name="fights" ref="fights"></property>
+		<property name="commandName" value="gameToCreate" />
+		<property name="commandClass" value="com.epam.publicenemies.dto.GameDto" />
+		<property name="formView" value="newGame" />
+		<property name="successView" value="fightPage.html" />
+	</bean>
+	<bean id="joinGameController" class="com.epam.publicenemies.web.JoinGameFormController">
+		<property name="fights" ref="fights"></property>
+		<property name="commandName" value="gameToJoin" />
+		<property name="commandClass" value="com.epam.publicenemies.dto.GameDto" />
+		<property name="formView" value="joinGame" />
+		<property name="successView" value="fightPage.html" />
+	</bean>
+	<bean id="fightHitController" class="com.epam.publicenemies.web.FightHitController">
+		<property name="fights" ref="fights"></property>
+		<property name="commandName" value="fightHit" />
+		<property name="commandClass" value="com.epam.publicenemies.dto.HitDto" />
+		<property name="formView" value="fightHit" />
+		<property name="successView" value="fightPage.html" />
+	</bean>
+	<bean id="userStartPageController" class="com.epam.publicenemies.web.UserStartPageController" />
+	<bean id="fightPageController" class="com.epam.publicenemies.web.FightPageFormController" />
+	<bean id="newJoinGamePageController" class="com.epam.publicenemies.web.NewJoinGamePageController" />
+	<bean id="userLogoutController" class="com.epam.publicenemies.web.UserLogoutController" />
+
+	<!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+	<!-- +++++++++++++++++++++++++++++++++++ MAPPING +++++++++++++++++++++++++++++++++++++++++++++++++ -->
+	<!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+	<bean name="URLmappings"
+		class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+		<property name="mappings">
+			<map>
+				<entry key="/userRegistration.html" value="registerUserController"></entry>
+				<entry key="/profileSave.html" value="saveProfileController"></entry>
+				<entry key="/userLogin.html" value="loginUserController"></entry>
+				<entry key="/userStartPage.html" value="userStartPageController"></entry>
+				<entry key="/logout.html" value="userLogoutController"></entry>
+				<entry key="/newJoinGame.html" value="newJoinGamePageController"></entry>
+				<entry key="/newGame.html" value="newGameController"></entry>
+				<entry key="/joinGame.html" value="joinGameController"></entry>
+				<entry key="/fightPage.html" value="fightPageController"></entry>
+				<entry key="/fightHit.html" value="fightHitController"></entry>
+			</map>
+		</property>
+	</bean>
+	<!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+	<!-- +++++++++++++++++++++++++++++++++++ VIEW RESOLVER +++++++++++++++++++++++++++++++++++++++++++ -->
+	<!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="viewClass"
+			value="org.springframework.web.servlet.view.JstlView" />
+		<property name="prefix" value="/WEB-INF/jsp/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+	<!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+	<!-- +++++++++++++++++++++++++++++++++++ MESSAGES +++++++++++++++++++++++++++++++++++++++++++++++ -->
+	<!-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ -->
+	<bean id="messageSource"
+		class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="basename" value="messages" />
+	</bean>
+</beans>
